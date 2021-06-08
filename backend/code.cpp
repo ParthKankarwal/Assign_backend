@@ -1,70 +1,68 @@
-#include<iostream>
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
+#define ll long long
+
 using namespace std;
-void Solve_bfs(vector < vector <int> > &res, vector <int> ans, int n, int u, vector <int> &Dt)
-{
-    queue <int>Q;
-    Q.push(u);
-    ans[u] = 1;
-    vector <int> distance;
-    distance.resize(n+1);
-    distance[u] = 0;
-    while(!Q.empty())
-    {
-        int t = Q.front();
-        Q.pop();
-        for(int i=0;i<res[t].size();i++)
-        {
-            if(ans[res[t][i]] == 0)
-            {
-                ans[res[t][i]] = 1;
-                distance[res[t][i]] = 1 + distance[t];
-                Q.push(res[t][i]);
-            }
-        }
+vector<ll> visit;
+vector<vector< vector<ll> > >  adj;
+vector<set <ll> > ma;
+void dfs(ll cur ,ll time){
+    if(time>visit[cur])return ;
+    visit[cur]=time;
+    if(ma[cur].find(time)!=ma[cur].end()){
+
+       auto i=ma[cur].find(time);
+       while(i!=ma[cur].end()  && (*i)==time){
+        i++;
+        time++;
+       }
+       time-=1;
     }
-    for(int i=1;i<=n;i++)
-    {
-        Dt[i] = max(Dt[i],distance[i]);
+    for(auto i: adj[cur]){
+        dfs(i[0],time+i[1]);
     }
+
+
 }
-int main()
-{
-    int n,h,x;
-    cin>>n>>h>>x;
-    vector <int> hot;
-    for(int i=0;i<h;i++)
-    {
-        int p;
-        cin>>p;
-        hot.push_back(p);
-    }
-    vector < vector <int> > res;
-    res.resize(n+1);
-    for(int i=0;i<n-1;i++)
-    {
-        int a,b;
-        cin>>a>>b;
-        res[a].push_back(b);
-        res[b].push_back(a);
-    }
-    vector <int> ans;
-    ans.resize(n+1);
-    vector <int> dist;
-    dist.resize(n+1);
-    dist.assign(n+1,-1);
-    for(int i=0;i<h;i++)
-    {
-        Solve_bfs(res, ans, n, hot[i],dist);
-    }
-    int ans = 0;
-    for(int i=1;i<=n;i++)
-    {
-        if(dist[i] <= x)
-        {
-            ans++;
+void add(ll a,ll b ,ll c){
+    adj[a].push_back({b,c});
+    adj[b].push_back({a,c});
+}
+int main(){
+    int t=1;
+    //cin>>t;
+    while(t--){
+
+      int n,m;
+      cin>>n>>m;
+      vector<ll> emp(n+1,INT_MAX);
+      vector<vector<vector< ll> > > emp2(n+1);
+      vector<set<ll> > emp3(n+1);
+      visit=emp;
+      adj=emp2;
+      ma=emp3;
+      ll a,b,c;
+      for(int i=0;i<m;i++){
+          cin>>a>>b>>c;
+          add(a,b,c);
+      }
+      for(int i=0;i<n;i++){
+        ll k ;
+        cin>>k;
+       for(int j=0;j<k;j++){
+            ll x;
+            cin>>x;
+            ma[i+1].insert(x);
         }
+      }
+      dfs(1,0);
+      if(visit[n]==INT_MAX){
+        cout<<-1<<endl;
+      }
+
+      else cout<<visit[n]<<endl;
+
+
     }
-    cout<<ans<<endl;
-    return 0;
+
+
 }
